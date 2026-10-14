@@ -480,16 +480,6 @@ let krml_args input_stream_binding emit_output_types_defs add_include skip_c_mak
                               "-minimal" ::
                                 "-add-include" :: "\"EverParse.h\"" ::
                                   "-fextern-c" ::
-                                    (* EverParse3d.Actions.Common.error_handler is
-                                       parameterized by the input stream types in
-                                       the Pulse prelude, and KaRaMeL has no
-                                       parameterized typedefs. The monomorphic
-                                       instantiation for this backend lives in a
-                                       leaf module; keeping *that* abbreviation
-                                       yields the same EVERPARSE_ERROR_HANDLER
-                                       typedef as the Low* backend. *)
-                                    ["-no-inline-type-abbrev";
-                                     pulse_error_handler_module input_stream_binding ^ ".error_handler"] @
                                     (if Options.get_hoist_locals ()
                                      then ["-fhoist-locals"]
                                      else []) @
@@ -502,11 +492,9 @@ let krml_args input_stream_binding emit_output_types_defs add_include skip_c_mak
                                     (if Options.get_line_comments ()
                                      then ["-fline-comments"]
                                      else []) @
-                                    (let init_locals_value = match Options.get_init_locals () with
-                                     | Some v -> v
-                                     | None -> "no"
-                                     in
-                                     ["-finitialize-locals"; init_locals_value]) @
+                                    (match Options.get_init_locals () with
+                                     | Some v -> ["-finitialize-locals"; v]
+                                     | None -> []) @
                                     external_types_lib_args @
                                     external_api_lib_args @
                                     external_types_no_prefix_args @
@@ -1027,11 +1015,9 @@ let produce_and_postprocess_c
   let everparse_h_existed_before = Sys.file_exists (filename_concat out_dir "EverParse.h") in
   (* produce the C files *)
   produce_c_files input_stream_binding emit_output_types_defs add_include skip_c_makefiles cleanup out_dir files_and_modules;
-  (* Karamel may produce an EverParse.h containing preserved type abbreviations
-   * (see -no-inline-type-abbrev). The postprocess step below copies the proper
-   * full EverParse.h from the prelude, which already provides those typedefs.
-   * If [no_everparse_h] is set and the file didn't exist before krml ran, we
-   * also need to remove the krml-produced one. *)
+  (* The postprocess step below copies the pre-generated EverParse.h. If
+   * [no_everparse_h] is set and the file did not exist before krml ran, remove
+   * any header produced by an explicit caller-supplied KaRaMeL option. *)
   let remove_krml_produced_everparse_h = not everparse_h_existed_before in
   (* postprocess the produced C files *)
   postprocess_c input_stream_binding true true clang_format clang_format_executable copy_clang_format_opt skip_c_makefiles cleanup no_everparse_h save_hashes_opt ~remove_krml_produced_everparse_h out_dir files_and_modules

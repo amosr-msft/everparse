@@ -110,9 +110,7 @@ def large(bits32=False):
          "-static-header", "Prims,LowParse.*,EverParse3d.*,Pulse.*",
          "-warn-error", "-9@4-20-26", "-fnoreturn-else", "-fparentheses",
          "-fcurly-braces", "-fmicrosoft", "-fno-shadow",
-         "-header", ROOT / "src/3d/noheader.txt", "-minimal", "-fextern-c",
-         "-finitialize-locals", "no", "-no-inline-type-abbrev",
-         "EverParse3d.Actions.ErrorHandler.LowstarExtern.error_handler"]
+         "-header", ROOT / "src/3d/noheader.txt", "-minimal", "-fextern-c"]
         + sorted((ROOT / "lib/everparse/3d/krml/extracted").glob("*.krml"))
         + [out / "LargeExtern.krml",
            "-bundle", "Prims,FStar.*,LowStar.*[rename=SHOULDNOTBETHERE]",

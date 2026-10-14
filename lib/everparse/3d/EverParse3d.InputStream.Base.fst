@@ -50,15 +50,9 @@ class input_stream_pts_to (base_t: Type0) (len_t: Type0) (pos_t: Type0) : Type =
    because [input_stream_inst] below must mention it, and Actions.Common
    depends on this module.
 
-   NOTE: this arrow must have exactly as many binders as the C function-pointer
-   type it extracts to. Ghost binders would be extracted by F* as extra [unit]
-   parameters of the type abbreviation, whereas Pulse drops them at application
-   sites and KaRaMeL drops them when emitting C; the resulting arity mismatch
-   makes KaRaMeL's Low* checker reject every generated validator as soon as the
-   abbreviation is preserved with -no-inline-type-abbrev (which is what gives
-   it the name EVERPARSE_ERROR_HANDLER). Hence the error handler is given
-   permission on the application context only: callers keep (and frame) their
-   permission on the input stream across the call.
+   The error handler is given permission on the application context only:
+   callers keep (and frame) their permission on the input stream across the
+   call.
 *)
 let error_handler_arrow
   (base_t: Type0) (len_t: Type0) (pos_t: Type0)

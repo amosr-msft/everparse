@@ -4,15 +4,8 @@ module EverParse3d.Actions.ErrorHandler.Buffer
 
    EverParse3d.InputStream.Base.error_handler_arrow is parameterized by the
    input stream types, because the Pulse prelude is built once and instantiated
-   through a typeclass. KaRaMeL has no parameterized typedefs, so it inlines
-   such an abbreviation at every use site and emits nothing for it -- which
-   would drop the public EVERPARSE_ERROR_HANDLER typedef that the Low* backend
-   provides, silently breaking clients that name it, and would spell the whole
-   function-pointer type out in every generated validator's prototype.
-
-   Instantiating it here at this backend's stream types makes it monomorphic
-   again, so `-no-inline-type-abbrev` can preserve it, and generated validators
-   name it in their prototypes.
+   through a typeclass. This module specializes it to this backend's stream
+   types.
 
    The backend's [input_stream_inst] instance carries this type as its
    [error_handler_t] member, so a validator's argument type reaches extraction
@@ -24,10 +17,6 @@ module EverParse3d.Actions.ErrorHandler.Buffer
    [error_handler_arrow_of] is how the instance discharges
    [error_handler_arrow_of_t]: the alias is transparent here, so it is the
    identity and needs no coercion.
-
-   This module is an API module of the `EverParse` bundle, whose rename-prefix
-   plus -fmicrosoft turn `error_handler` into `EVERPARSE_ERROR_HANDLER`. See
-   lib/everparse/3d/krml/header.Makefile.
 
    It holds nothing else: the bundle makes a whole module public at a time, and
    only one of the ErrorHandler modules may be public per backend, or the two
